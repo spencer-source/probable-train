@@ -91,68 +91,26 @@ for nd in [30, 50, 100, 250, 500, 750, 1_000, 10_000]:
   total = write_dists_to_tfr(distributions, labels, sample_size=nd, sample_count=1_000, filename="tfrecords/validate_")
   print(total)  
 
-
-
-
-test_Ns = [50, 100, 250, 500, 750, 1_000, 10_000]
-
-test_loc = [20., 60., 100., 20., 60., 100., 20., 60., 100.]
-test_scale = [10., 10., 10., 30., 30., 30., 50., 50., 50.]
-
 test_distributions = [
-    tfd.Uniform(low=[20, 60, 100, 20, 60, 100, 20, 60, 100],\
-      high=[30, 90, 150, 30, 90, 150, 30, 90, 150]),
-    tfd.Normal(loc=test_loc, scale=test_scale),
-    tfd.Logistic(loc=test_loc, scale=test_scale),
-    tfd.Exponential(rate=[1., 1.2, 1.3, 1.4, 1.5, 2., 2.1, 3., 3.1]),
-    tfd.Laplace(loc=test_loc, scale=test_scale),
-    tfd.HalfNormal(scale=test_scale),
-    tfd.LogLogistic(loc=[1., 1.2, 1.3, 1.4, 1.5, 2., 2.1, 3., 3.1],\
-      scale=[10.]),
-    tfd.LogNormal(loc=[1., 1.2, 1.3, 1.4, 1.5, 2., 2.1, 3., 3.1], scale=[10.]),
-    tfd.Gumbel(loc=test_loc, scale=test_scale)  
+    tfd.Uniform(low=0.0, high=2.0),
+    tfd.Normal(loc=0.0, scale=2.0),
+    tfd.Logistic(loc=0.0, scale=2.0),
+    tfd.Exponential(rate=2.0),
+    tfd.Laplace(loc=0.0, scale=2.0),
+    tfd.HalfNormal(scale=2.0),
+    tfd.LogLogistic(loc=0.0, scale=2.0),
+    tfd.LogNormal(loc=0.0, scale=2.0),
+    tfd.Gumbel(loc=0.0, scale=2.0)    
 ]
 
 test_labels = {}
 for i in range(len(test_distributions)):
     test_labels[test_distributions[i].name]=i
 
-def write_test_dists_to_tfr(dists, labels, sample_size, sample_count:int=10_000, filename:str="tfrecords/"):
-  
-  filename= filename+f"{sample_size}.tfrecords"
-  options = tf.io.TFRecordOptions(compression_type='GZIP')
-  writer = tf.io.TFRecordWriter(filename, options=options) 
-  initial_len = len(dists) * 9
-  sample_shard = sample_count//10
-  
-  total = 0
-  cycle_dists = cycle(dists)
-  for dist in cycle_dists:
-    tf.random.set_seed(seed()) # from seed stream
-    cur_dist = dist.sample(sample_shape=(sample_shard, sample_size))
-    cur_lbl = test_labels[dist.name]
-    
-    cur_dist_split = tf.unstack(cur_dist, axis=-1)
-    count = 0
-    for i in cur_dist_split:
-      jj = tf.unstack(i, axis=0)
-      for j in jj:
-        out = parse_single_dist(dist=j, lab=cur_lbl)
-        writer.write(out)
-        count += 1
-    total += count
-    if total >= initial_len*sample_count:
-      break
-  writer.close()
-  
-  return total
 
-seed = tfp.util.SeedStream(123, salt='stochastic')
-for nd in test_Ns:
-  total = write_test_dists_to_tfr(test_distributions, test_labels, sample_size=nd, sample_count=1_000, filename="tfrecords/test_")
+for nd in [30, 50, 100, 250, 500, 750, 1_000, 10_000]:
+  total = write_dists_to_tfr(test_distributions, test_labels, sample_size=nd, sample_count=1_000, filename="tfrecords/test_")
   print(total)  
-
-
 
 
 

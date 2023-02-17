@@ -1,11 +1,10 @@
 
-import datetime
 import math
 import numpy as np
 import tensorflow as tf
 import tensorflow_probability as tfp
-a = 1<<16
-np.sqrt(a) * 1.6
+
+
 def read_tfrecord(example):
     LABELED_TFREC_FORMAT = {
         "ip": tf.io.FixedLenFeature([], tf.string), # tf.string means bytestring
